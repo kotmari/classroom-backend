@@ -2,12 +2,17 @@
   "compilerOptions": {
     /* Language & runtime */
     "target": "ES2022",
-    "lib": ["ES2022"],
+     "lib": ["ES2022"],
 
-    /* Node ESM */
+    // /* Node ESM */
     "module": "ES2022",
     "moduleResolution": "node",
+    "ignoreDeprecations": "6.0",
 
+    /* Node ESM - NodeNext */
+    // "module": "NodeNext",
+    // "moduleResolution": "NodeNext",
+    
     /* Project structure */
     "rootDir": "src",
     "outDir": "dist",
@@ -30,5 +35,9 @@
     /* Environment types */
     "types": ["node"]
   },
-  "include": ["src"]
+  // "include": ["src"]
+  "include": [
+    "src/**/*", 
+    "node_modules/@types/node" 
+  ]
 }
