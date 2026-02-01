@@ -1,5 +1,7 @@
 import express from 'express'
 import subjectRouter from './db/routes/subjects'
+import userRouter from './db/routes/users'
+import classesRouter from './db/routes/classes'
 import cors from 'cors'
 import securityMiddleware from './middleware/security'
 import { toNodeHandler } from "better-auth/node";
@@ -22,6 +24,8 @@ app.use(express.json())
 app.use(securityMiddleware)
 
 app.use('/api/subjects', subjectRouter)
+app.use('/api/users', userRouter)
+app.use('/api/classes', classesRouter)
 
 app.get('/', (req, res) => {
    res.send('Hello')

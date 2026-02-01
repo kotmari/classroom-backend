@@ -44,15 +44,20 @@ const securityMiddleware = async (req: Request, res:Response, next:NextFunction)
 
          const decision = await client.protect(arcjetRequest)
 
-         if(!decision.isDenied() && decision.reason.isBot()){
-            return res.status(403).json({error: 'Forbidden', message: "Automated requests are not allowed."})
-         }
-         if(!decision.isDenied() && decision.reason.isShield()){
-            return res.status(403).json({error: 'Forbidden', message: "Requests blocked by security policy"})
-         }
-         if(!decision.isDenied() && decision.reason.isRateLimit()){
-            return res.status(403).json({error: 'To many requests.', message})
-         }
+if (decision.isDenied()) {
+  if (decision.reason.isBot()) {
+    return res.status(403).json({ error: 'Forbidden', message: "Automated requests are not allowed." });
+  }
+  if (decision.reason.isShield()) {
+    return res.status(403).json({ error: 'Forbidden', message: "Requests blocked by security policy" });
+  }
+  if (decision.reason.isRateLimit()) {
+    return res.status(429).json({ error: 'Too many requests.', message });
+  }
+  
+
+  return res.status(403).json({ error: 'Forbidden', message: "Access denied" });
+}
 
          next()
 
