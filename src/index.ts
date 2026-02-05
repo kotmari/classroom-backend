@@ -21,7 +21,7 @@ app.use(cors({
 app.all("/api/auth/*splat", toNodeHandler(auth));
 
 app.use(express.json())
-app.use(securityMiddleware)
+// app.use(securityMiddleware)
 
 app.use('/api/subjects', subjectRouter)
 app.use('/api/users', userRouter)

@@ -1,7 +1,8 @@
 import express from "express";
 import { db } from "..";
-import { classes, subjects, user } from "../../db/schema/index";
+import { classes, departments, subjects, user } from "../../db/schema/index";
 import { and, desc, eq, getTableColumns, ilike, or, sql } from "drizzle-orm";
+import { error } from "node:console";
 
 const router = express.Router();
 
@@ -64,19 +65,17 @@ router.get("/", async (req, res) => {
       .limit(limitPerPage)
       .offset(offset);
 
-      res.status(200).json({
-        data: classesList,
-        pagination: {
-          page: currentPage,
-          limit: limitPerPage,
-          total: totalCount,
-          totalPage: Math.ceil(totalCount / limitPerPage)
-        }
-      })
-
-
+    res.status(200).json({
+      data: classesList,
+      pagination: {
+        page: currentPage,
+        limit: limitPerPage,
+        total: totalCount,
+        totalPage: Math.ceil(totalCount / limitPerPage),
+      },
+    });
   } catch (error) {
-     console.error("GET /classes error:", error);
+    console.error("GET /classes error:", error);
     res.status(500).json({ error: "Failed to fetch classes" });
   }
 });
@@ -117,6 +116,36 @@ router.post("/", async (req, res) => {
     console.error("POST /classes error:", error);
     res.status(500).json({ error: "Failed to create class" });
   }
+});
+
+router.get("/:id", async (req, res) => {
+  const classId = Number(req.params.id);
+
+  if (!Number.isFinite(classId))
+    return res.status(400).json({ error: "No Class fount" });
+
+  const [classDetails] = await db
+    .select({
+      ...getTableColumns(classes),
+      subject: {
+        ...getTableColumns(subjects),
+      },
+      department: {
+        ...getTableColumns(departments),
+      },
+      teacher: {
+        ...getTableColumns(user),
+      },
+    })
+    .from(classes)
+    .leftJoin(subjects, eq(classes.subjectId, subjects.id))
+    .leftJoin(user, eq(classes.teacherId, user.id))
+    .leftJoin(departments, eq(subjects.departmentId, departments.id))
+    .where(eq(classes.id, classId));
+
+  if (!classDetails) return res.status(404).json({ error: "No Class fount" });
+
+  return res.status(200).json({ data: classDetails });
 });
 
 export default router;
